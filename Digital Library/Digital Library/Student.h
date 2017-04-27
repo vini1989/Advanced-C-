@@ -52,6 +52,9 @@ public:
 		m_department = department;
 	}
 
+	int studentId() {
+		return m_studentId;
+	}
 
 	std::string getFirstName() {
 		return m_firstName;
