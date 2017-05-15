@@ -5,7 +5,7 @@
 
 class Admin {
 private:
-	int m_adminId;
+	int m_adminId;//
 	std::string  m_firstName, m_lastName;
 
 public:
