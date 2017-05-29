@@ -19,15 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Admin.h" />
-    <ClInclude Include="AdminMap.h" />
-    <ClInclude Include="main.h" />
-    <ClInclude Include="Student.h" />
-    <ClInclude Include="StudentMap.h" />
+    <ClInclude Include="UdpClient.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Server.cpp" />
+    <ClCompile Include="UdpClient.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DB7C8518-8786-4023-80B7-8262BB1307F9}</ProjectGuid>
