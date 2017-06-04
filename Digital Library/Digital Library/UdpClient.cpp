@@ -4,6 +4,12 @@
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/udp.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <sstream>
+#include<boost/serialization/vector.hpp>
+#include<boost/serialization/map.hpp>
+
 #include "UdpClient.h"
 	
 	UdpClient::UdpClient(std::string address, boost::asio::io_service &io_service):
@@ -36,8 +42,12 @@
 
 	void UdpClient::roleMenu() {
 
-		std::cout << "Please choose you role:" << std::endl << "1. Press 1 for Admin" << std::endl << "2. Press 2 for student"<<std::endl;
-		std::cin >> m_roleId;
+		do {
+			std::cout << "Please choose you role:" << std::endl << "1. Press 1 for Admin" << std::endl << "2. Press 2 for student" << std::endl;
+			std::cin >> m_roleId;
+		}
+
+		while (m_roleId != 1 && m_roleId != 2);
 
 		switch (m_roleId) {
 		case 1:
@@ -64,7 +74,7 @@
 		std::cout << "8. Modify book" << std::endl;
 		std::cout << "9. Mark book as borrowed" << std::endl;
 		std::cout << "10. Mark book as return" << std::endl;
-		std::cout << "Press esc to return" << std::endl;
+		std::cout << "11. To return" << std::endl;
 
 		std::cin >> m_taskId;
 
@@ -76,10 +86,10 @@
 			getStudent();
 			break;
 		case 3:
-
+			editStudent();
 			break;
 		case 4:
-
+			deleteStudent();
 			break;
 		case 5:
 			addStudent();
@@ -88,18 +98,109 @@
 		case 6:
 			break;
 
+
+		case 11:
+			roleMenu();
+			break;
+
 		}
 
 	}
 
+	void UdpClient::editStudent() {
+		std::vector<std::string> vector;
+		int studentId;
+		std::string firstName, lastName,  department;
+		std::string  send_buf = "E";
+		send_buf.append("," + std::to_string(m_roleId) + "," + std::to_string(m_taskId));
+		//send_buf = ;
+
+		do {
+			std::cout << "Enter student id" << std::endl;
+			std::cin >> studentId;
+
+		} while (studentId<0 && studentId>999999);
+		
+		std::cout << "Enter student new information" << std::endl;
+		std::cout << "Enter student firstName" << std::endl;
+		std::cin >> firstName;
+
+		std::cout << "Enter student lastName" << std::endl;
+		std::cin >> lastName;
+
+		std::cout << "Enter student department" << std::endl;
+		std::cin >> department;
+
+		send_buf = send_buf + "," + std::to_string(studentId) + "," + firstName + "," + lastName + "," + department;
+
+
+		//m_socket.open(boost::asio::ip::udp::v4());
+
+		m_socket.send_to(boost::asio::buffer(send_buf), m_receiver_endpoint);
+
+		size_t const len = m_socket.receive_from(
+			boost::asio::buffer(recv_buf), m_sender_endpoint);
+
+		std::string const received_message(recv_buf.data(), len);
+		std::cout << "Student information edited successfully. New student details are:" << std::endl;
+
+		try
+		{
+			std::string archive_data(received_message);
+			std::istringstream archive_stream(archive_data);
+			boost::archive::text_iarchive archive(archive_stream);
+			archive >> vector;
+			displaySingleStudent(vector);
+			Iscontinue();
+		}
+		catch (std::exception& e)
+		{
+			// Unable to decode data.
+			boost::system::error_code error(boost::asio::error::invalid_argument);
+			return;
+		}
+
+
+	}
+
+	void UdpClient::deleteStudent() {
+		int studentId;
+		std::vector<std::string> vector;
+		//send_buf = ;
+
+		do {
+			std::cout << "Enter student id" << std::endl;
+			std::cin >> studentId;
+
+		} while (studentId<0 && studentId>999999);
+
+		std::string  send_buf = "E";
+		send_buf.append("," + std::to_string(m_roleId) + "," + std::to_string(m_taskId) + "," + std::to_string(studentId));
+		m_socket.send_to(boost::asio::buffer(send_buf), m_receiver_endpoint);
+
+		size_t const len = m_socket.receive_from(
+			boost::asio::buffer(recv_buf), m_sender_endpoint);
+
+		std::string const received_message(recv_buf.data(), len);
+		std::cout << received_message << std::endl;
+		
+		Iscontinue();
+		//else
+		//other data
+	}
+
 	void UdpClient::addStudent() {
-		std::string firstName,lastName,studentId,department;
+		int studentId;
+		std::string firstName,lastName,department;
 		std::string  send_buf = "E";
 		send_buf.append(","+std::to_string(m_roleId) + "," +std::to_string(m_taskId));
 		//send_buf = ;
 
-		std::cout << "Enter student id" << std::endl;
-		std::cin >> studentId;
+		do {
+			std::cout << "Enter student id" << std::endl;
+			std::cin >> studentId;
+
+		} while (studentId<0 && studentId>999999 );
 
 		std::cout << "Enter student firstName" << std::endl;
 		std::cin >> firstName;
@@ -110,7 +211,7 @@
 		std::cout << "Enter student department" << std::endl;
 		std::cin >> department;
 
-		send_buf = send_buf + ","+studentId+"," + firstName + "," + lastName + "," + department;
+		send_buf = send_buf + ","+std::to_string(studentId)+"," + firstName + "," + lastName + "," + department;
 
 
 		//m_socket.open(boost::asio::ip::udp::v4());
@@ -123,16 +224,42 @@
 		std::string const received_message(recv_buf.data(), len);
 		std::cout << "received from server: \"" << received_message << "\"" << std::endl;
 
+		Iscontinue();
 	}
 
+	void UdpClient::Iscontinue() {
+		char ch='h';
+
+
+		do {
+			std::cout << "Do you wish to continue? Press 'y' or 'n' " << std::endl;
+			std::cin >> ch;
+
+		}
+		while(ch!='y' && ch!='n' && ch != 'Y' && ch != 'N');
+
+		if (ch == 'y' || ch == 'Y') {
+		if(m_roleId==1)
+			showStudentMenu();
+//show student menu
+		}
+
+		else
+			roleMenu();
+
+
+	}
 
 	void UdpClient::getStudent() {
 		int studentId;
-		
+		std::vector<std::string> vector;
 		//send_buf = ;
 
-		std::cout << "Enter student id" << std::endl;
-		std::cin >> studentId;
+		do {
+			std::cout << "Enter student id" << std::endl;
+			std::cin >> studentId;
+
+		} while (studentId<0 && studentId>999999);
 
 		std::string  send_buf = "E";
 		send_buf.append("," + std::to_string(m_roleId) + "," + std::to_string(m_taskId)+ "," + std::to_string(studentId));
@@ -142,21 +269,72 @@
 			boost::asio::buffer(recv_buf), m_sender_endpoint);
 
 		std::string const received_message(recv_buf.data(), len);
-		std::cout << "received from server: \"" << received_message << "\"" << std::endl;
-
+		//std::cout << "received from server: \"" << received_message << "\"" << std::endl;
+		try
+		{
+			std::string archive_data(received_message);
+			std::istringstream archive_stream(archive_data);
+			boost::archive::text_iarchive archive(archive_stream);
+			archive >> vector;
+			displaySingleStudent(vector);
+			Iscontinue();
+		}
+		catch (std::exception& e)
+		{
+			// Unable to decode data.
+			boost::system::error_code error(boost::asio::error::invalid_argument);
+			return;
+		}
 	}
 
 
 	void UdpClient::getAllStudentDetail(){
-		std::string const send_buf = std::to_string(m_roleId)+","+std::to_string(m_taskId);
-		
+		std::map<int, std::vector<std::string>> map;
+		//send_buf = ;
+
+	std::string  send_buf = "E";
+		send_buf.append("," + std::to_string(m_roleId) + "," + std::to_string(m_taskId));
 		m_socket.send_to(boost::asio::buffer(send_buf), m_receiver_endpoint);
 
 		size_t const len = m_socket.receive_from(
 			boost::asio::buffer(recv_buf), m_sender_endpoint);
 
 		std::string const received_message(recv_buf.data(), len);
-		std::cout << "received from server: \"" << received_message << "\"" << std::endl;
-
+		//std::cout << "received from server: \"" << received_message << "\"" << std::endl;
+		try
+		{
+			std::string archive_data(received_message);
+			std::istringstream archive_stream(archive_data);
+			boost::archive::text_iarchive archive(archive_stream);
+			archive >> map;
+			displayAllStudentData(map);
+		
+			Iscontinue();
+		}
+		catch (std::exception& e)
+		{
+			// Unable to decode data.
+			boost::system::error_code error(boost::asio::error::invalid_argument);
+			return;
+		}
 	}
 	
+	void UdpClient::displayAllStudentData(std::map<int, std::vector<std::string>> map) {
+		std::map<int, std::vector<std::string>>::iterator itr;
+		std::cout << "List of all students" << std::endl;
+		std::cout << "StudentID		First Name		Last Name		Department" << std::endl;
+		for (itr = map.begin();itr != map.end();itr++) {
+			std::cout << itr->first << ": ";
+			for (std::vector<std::string>::iterator it = itr->second.begin();it != itr->second.end();it++) {
+				std::cout << *it << "		"<<std::endl;
+			}
+		}
+		
+	}
+
+	void UdpClient::displaySingleStudent(std::vector<std::string> &vector) {
+		std::cout << "StudentID		First Name		Last Name		Department" << std::endl;
+			for (std::vector<std::string>::iterator it = vector.begin();it != vector.end();it++) {
+				std::cout << *it << "		"<<std::endl;
+		}
+	}

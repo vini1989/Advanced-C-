@@ -4,6 +4,7 @@
 #include <memory>
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/udp.hpp>
+#include <map>
 
 
 
@@ -34,4 +35,14 @@ public:
 	void connectToServer();
 
 	void getStudent();
+
+	void displayAllStudentData(std::map<int,std::vector<std::string>> map);
+
+	void displaySingleStudent(std::vector<std::string> &vector);
+	void deleteStudent();
+
+	void editStudent();
+
+	void Iscontinue();
+
 };
