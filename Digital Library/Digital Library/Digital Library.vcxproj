@@ -96,12 +96,12 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Ammarah\Downloads\boost_1_64_0\boost_1_64_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Vini the Pooh!!\Documents\SS2017\Adv C++\boost_1_64_0</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\Ammarah\Downloads\boost_1_64_0\boost_1_64_0\stage\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\Vini the Pooh!!\Documents\SS2017\Adv C++\boost_1_64_0\stage\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

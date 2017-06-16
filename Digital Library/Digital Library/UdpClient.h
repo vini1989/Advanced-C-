@@ -5,7 +5,7 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/udp.hpp>
 #include <map>
-
+#include <vector>
 
 
 class UdpClient {
@@ -26,7 +26,7 @@ public:
 	
 	void roleMenu();
 
-	void showStudentMenu();
+	void showAdminMenu();
 
 	void addStudent();
 
@@ -39,9 +39,28 @@ public:
 	void displayAllStudentData(std::map<int,std::vector<std::string>> map);
 
 	void displaySingleStudent(std::vector<std::string> &vector);
+
 	void deleteStudent();
 
 	void editStudent();
+
+	void showAllBooks();
+
+	void showSingleBook();
+
+	void displayAllBookData(std::map<int, std::vector<std::string>> bMap);
+
+	void displaySingleBook(int bookId, std::vector<std::string> &vector);
+
+	void addBook();
+
+	void editBook();
+
+	void markBookBorrowed();
+
+	void showAllBorrowedBooks();
+
+	void displayAllBorrowedBookData(std::map<int, std::vector<std::string>> borrowMap);
 
 	void Iscontinue();
 
